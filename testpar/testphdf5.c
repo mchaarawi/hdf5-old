@@ -379,6 +379,8 @@ int main(int argc, char **argv)
 	    "extendible dataset independent write #2", PARATESTFILE);
     AddTest("selnone", none_selection_chunk, NULL,
             "chunked dataset with none-selection", PARATESTFILE);
+/* MSC - serial means not MPI-IO, not in DAOS tier */
+#ifdef DAOS_UNSUPPORTED
     AddTest("calloc", test_chunk_alloc, NULL,
             "parallel extend Chunked allocation on serial file", PARATESTFILE);
     AddTest("fltread", test_filter_read, NULL,
@@ -388,6 +390,7 @@ int main(int argc, char **argv)
     AddTest("cmpdsetr", compress_readAll, NULL,
 	    "compressed dataset collective read", PARATESTFILE);
 #endif /* H5_HAVE_FILTER_DEFLATE */
+#endif
 
     AddTest("zerodsetr", zero_dim_dset, NULL,
 	    "zero dim dset", PARATESTFILE);
@@ -419,8 +422,11 @@ int main(int argc, char **argv)
 #else
     printf("big dataset test will be skipped on Windows (JIRA HDDFV-8064)\n");
 #endif
+/** MSC - default fill value of 0 does not work with DAOS */
+#ifdef DAOS_UNSUPPORTED
     AddTest("fill", dataset_fillvalue, NULL,
 	    "dataset fill value", PARATESTFILE);
+#endif
 
     AddTest("cchunk1",
 	coll_chunk1,NULL, "simple collective chunk io",PARATESTFILE);
@@ -532,6 +538,8 @@ int main(int argc, char **argv)
     AddTest((mpi_size < 2)? "-fiodc" : "fiodc", file_image_daisy_chain_test, NULL,
             "file image ops daisy chain", NULL);
 
+/* MSC - not atomicity support in DAOS ADIO. */
+#ifdef DAOS_UNSUPPORTED
     if((mpi_size < 2)&& MAINPROCESS ) {
 	printf("Atomicity tests need at least 2 processes to participate\n");
 	printf("8 is more recommended.. Atomicity tests will be skipped \n");
@@ -543,6 +551,7 @@ int main(int argc, char **argv)
         AddTest("atomicity", dataset_atomicity, NULL,
                 "dataset atomic updates", PARATESTFILE);
     }
+#endif
 
     AddTest("denseattr", test_dense_attr, NULL,
 	    "Store Dense Attributes", PARATESTFILE);
